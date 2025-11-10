@@ -81,6 +81,153 @@ void viewStock() {
 
 void searchStock() {
     struct Stock s;
+    char name[50];
+    int found = 0;
+    printf("Enter Item Name to search: ");
+    scanf(" %[^\n]%*c", name);
+    
+    file = fopen("stock.txt", "r");
+    if (file == NULL) {
+        printf("No records found!\n");
+        return;
+    }
+    
+    while (fscanf(file, "%d %s %d %f", &s.id, s.name, &s.quantity, &s.price) != EOF) {
+        if (strcmp(s.name, name) == 0) {
+            printf("Record Found:\nID: %d\nName: %s\nQuantity: %d\nPrice: %.2f\n", 
+                   s.id, s.name, s.quantity, s.price);
+            found = 1;
+            break;
+        }
+    }
+    if (!found) {
+        printf("Record not found!\n");
+    }
+    fclose(file);
+}
+
+void updateStock() {
+    struct Stock s;
+    char name[50];
+    int found = 0;
+    FILE *temp;
+    printf("Enter Item Name to update: ");
+    scanf(" %[^\n]%*c", name);
+
+    file = fopen("stock.txt", "r");
+    temp = fopen("temp.txt", "w");
+    if (file == NULL || temp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    while (fscanf(file, "%d %s %d %f", &s.id, s.name, &s.quantity, &s.price) != EOF) {
+        if (strcmp(s.name, name) == 0) {
+            printf("Enter New Name: ");
+            scanf(" %[^\n]%*c", s.name);
+            printf("Enter New Quantity: ");
+            scanf("%d", &s.quantity);
+            printf("Enter New Price: ");
+            scanf("%f", &s.price);
+            found = 1;
+        }
+        fprintf(temp, "%d %s %d \t%.2f\n", s.id, s.name, s.quantity, s.price);
+    }
+
+    fclose(file);
+    fclose(temp);
+
+    remove("stock.txt");
+    rename("temp.txt", "stock.txt");
+
+    if (found) {
+        printf("Record Updated Successfully!\n");
+    } else {
+        printf("Record not found!\n");
+    }
+}
+
+void deleteStock() {
+    struct Stock s;
+    char name[50];
+    int found = 0;
+    FILE *temp;
+    printf("Enter Item Name to delete: ");
+    scanf(" %[^\n]%*c", name);
+
+    file = fopen("stock.txt", "r");
+    temp = fopen("temp.txt", "w");
+    if (file == NULL || temp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    while (fscanf(file, "%d %s %d %f", &s.id, s.name, &s.quantity, &s.price) != EOF) {
+        if (strcmp(s.name, name) == 0) {
+            found = 1;
+            continue; // Skip writing this record
+        }
+        fprintf(temp, "%d %s %d \t%.2f\n", s.id, s.name, s.quantity, s.price);
+    }
+
+    fclose(file);
+    fclose(temp);
+
+    remove("stock.txt");
+    rename("temp.txt", "stock.txt");
+
+    if (found) {
+        printf("Record Deleted Successfully!\n");
+    } else {
+        printf("Record not found!\n");
+    }
+}            case 3: deleteStock(); break;
+            case 4: searchStock(); break;
+            case 5: viewStock(); break;
+            case 6: exit(0);
+            default: printf("Invalid choice! Try again.\n");
+        }
+    }
+    return 0;
+}
+
+void addStock() {
+    struct Stock s;
+    file = fopen("stock.txt", "a");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+    printf("Enter Item ID: ");
+    scanf("%d", &s.id);
+    printf("Enter Item Name: ");
+    scanf(" %[^\n]%*c", s.name);
+    printf("Enter Quantity: ");
+    scanf("%d", &s.quantity);
+    printf("Enter Price: ");
+    scanf("%f", &s.price);
+
+    fprintf(file, "%d %s %d \t\t%.2f\n", s.id, s.name, s.quantity, s.price);
+    fclose(file);
+    printf("Record Added Successfully!\n");
+}
+
+void viewStock() {
+    struct Stock s;
+    file = fopen("stock.txt", "r");
+    if (file == NULL) {
+        printf("No records found!\n");
+        return;
+    }
+    printf("\nID\tName\tQuantity\tPrice\n");
+    while (fscanf(file, "%d %s %d %f", &s.id, s.name, &s.quantity, &s.price) != EOF) {
+        printf("%d\t%s\t%d\t%.2f\n", s.id, s.name, s.quantity, s.price);
+    }
+    fclose(file);
+}
+
+void searchStock() {
+    struct Stock s;
     int id, found = 0;
     printf("Enter Item ID to search: ");
     scanf("%d", &id);
@@ -176,4 +323,5 @@ void deleteStock() {
         printf("Record not found!\n");
     }
 }
+
 
